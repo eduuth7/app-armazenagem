@@ -170,14 +170,50 @@ const [imagem, setImagem] = useState<any>(null);
 );
 let imageUrl = '';
 
+
+
 if (imagem) {
 
   imageUrl = await new Promise((resolve) => {
 
     const reader = new FileReader();
 
-    reader.onloadend = () => {
-     resolve(reader.result as string);
+    reader.onload = (event: any) => {
+
+      const img = new Image();
+
+      img.onload = () => {
+
+        const canvas = document.createElement('canvas');
+
+        const MAX_WIDTH = 600;
+
+        const scaleSize = MAX_WIDTH / img.width;
+
+        canvas.width = MAX_WIDTH;
+        canvas.height = img.height * scaleSize;
+
+        const ctx = canvas.getContext('2d');
+
+        ctx?.drawImage(
+          img,
+          0,
+          0,
+          canvas.width,
+          canvas.height
+        );
+
+        const compressedBase64 = canvas.toDataURL(
+          'image/jpeg',
+          0.6
+        );
+
+        resolve(compressedBase64);
+
+      };
+
+      img.src = event.target.result;
+
     };
 
     reader.readAsDataURL(imagem);
@@ -481,7 +517,6 @@ const exportarCSV = () => {
 <input
   type="file"
   accept="image/*"
-  capture="environment"
   className="input-modern"
   style={{ marginTop: '20px' }}
   onChange={(e: any) => {
