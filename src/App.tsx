@@ -44,12 +44,13 @@ export default function App() {
   const [busca, setBusca] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const [form, setForm] = useState({
-    data: new Date().toISOString().split('T')[0],
-    inicio: '',
-    fim: '',
-    descricao: ''
-  });
+ const [form, setForm] = useState({
+  data: new Date().toISOString().split('T')[0],
+  inicio: '',
+  fim: '',
+  descricao: '',
+  status: 'Em andamento'
+});
 
   // AUTH
   useEffect(() => {
@@ -166,21 +167,23 @@ export default function App() {
       );
 
       await addDoc(collRef, {
-        turno: turnoLogado,
-        data: form.data,
-        inicio: form.inicio,
-        fim: form.fim,
-        descricao: form.descricao,
-        userId: firebaseUser.uid,
-        createdAt: serverTimestamp()
-      });
+  turno: turnoLogado,
+  data: form.data,
+  inicio: form.inicio,
+  fim: form.fim,
+  descricao: form.descricao,
+  status: form.status,
+  userId: firebaseUser.uid,
+  createdAt: serverTimestamp()
+});
 
       setForm({
-        data: new Date().toISOString().split('T')[0],
-        inicio: '',
-        fim: '',
-        descricao: ''
-      });
+  data: new Date().toISOString().split('T')[0],
+  inicio: '',
+  fim: '',
+  descricao: '',
+  status: 'Em andamento'
+});
 
     } catch (error) {
 
@@ -380,28 +383,41 @@ export default function App() {
 
           <div className="grid-3">
 
-            <input
-              type="date"
-              value={form.data}
-              onChange={(e) => setForm({ ...form, data: e.target.value })}
-              className="input-modern"
-            />
+  <input
+    type="date"
+    value={form.data}
+    onChange={(e) => setForm({ ...form, data: e.target.value })}
+    className="input-modern"
+  />
 
-            <input
-              type="time"
-              value={form.inicio}
-              onChange={(e) => setForm({ ...form, inicio: e.target.value })}
-              className="input-modern"
-            />
+  <input
+    type="time"
+    value={form.inicio}
+    onChange={(e) => setForm({ ...form, inicio: e.target.value })}
+    className="input-modern"
+  />
 
-            <input
-              type="time"
-              value={form.fim}
-              onChange={(e) => setForm({ ...form, fim: e.target.value })}
-              className="input-modern"
-            />
+  <input
+    type="time"
+    value={form.fim}
+    onChange={(e) => setForm({ ...form, fim: e.target.value })}
+    className="input-modern"
+  />
 
-          </div>
+  <select
+    value={form.status}
+    onChange={(e) => setForm({ ...form, status: e.target.value })}
+    className="input-modern"
+  >
+
+    <option>Em andamento</option>
+    <option>Finalizado</option>
+    <option>Pendente</option>
+    <option>Crítico</option>
+
+  </select>
+
+</div>
 
           <textarea
             rows={4}
@@ -468,6 +484,7 @@ export default function App() {
                 <th>Data</th>
                 <th>Horário</th>
                 <th>Descrição</th>
+                <th>Status</th>
 
               </tr>
 
@@ -487,8 +504,40 @@ export default function App() {
                     {reg.inicio} até {reg.fim}
                   </td>
 
-                  <td>{reg.descricao}</td>
+                 <td>{reg.descricao}</td>
 
+<td>
+
+  <span
+    style={{
+      padding: '6px 12px',
+      borderRadius: '999px',
+      fontSize: '12px',
+      fontWeight: 600,
+
+      background:
+        reg.status === 'Finalizado'
+          ? 'rgba(34,197,94,0.2)'
+          : reg.status === 'Crítico'
+          ? 'rgba(239,68,68,0.2)'
+          : reg.status === 'Pendente'
+          ? 'rgba(234,179,8,0.2)'
+          : 'rgba(59,130,246,0.2)',
+
+      color:
+        reg.status === 'Finalizado'
+          ? '#22c55e'
+          : reg.status === 'Crítico'
+          ? '#ef4444'
+          : reg.status === 'Pendente'
+          ? '#eab308'
+          : '#3b82f6'
+    }}
+  >
+    {reg.status}
+  </span>
+
+</td>
                 </tr>
 
               ))}
