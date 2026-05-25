@@ -513,16 +513,12 @@ export default function App() {
 <td>
 
   <select
-    value={reg.status}
+   value={reg.status || 'Em andamento'}
     onChange={async (e) => {
 
       try {
 
-        const docRef = doc(
-  db,
-  'inconsistencias',
-  reg.id
-);
+       const docRef = doc( db, 'inconsistencias', reg.id);
 
         await updateDoc(docRef, {
           status: e.target.value
@@ -542,7 +538,7 @@ export default function App() {
       minWidth: '160px',
 
       background:
-        reg.status === 'Finalizado'
+        (reg.status || 'Em andamento')
           ? 'rgba(34,197,94,0.15)'
           : reg.status === 'Crítico'
           ? 'rgba(239,68,68,0.15)'
@@ -551,7 +547,7 @@ export default function App() {
           : 'rgba(59,130,246,0.15)',
 
       color:
-        reg.status === 'Finalizado'
+        (reg.status || 'Em andamento')
           ? '#22c55e'
           : reg.status === 'Crítico'
           ? '#ef4444'
