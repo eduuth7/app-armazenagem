@@ -2,7 +2,15 @@ import './index.css';
 import React, { useState, useEffect, useMemo } from 'react';
 import { initializeApp } from 'firebase/app';
 import { getAuth, signInAnonymously, onAuthStateChanged } from 'firebase/auth';
-import { getFirestore, collection, addDoc, onSnapshot, serverTimestamp } from 'firebase/firestore';
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  onSnapshot,
+  serverTimestamp,
+  doc,
+  updateDoc
+} from 'firebase/firestore';
 
 // FIREBASE
 const firebaseConfig = {
@@ -89,13 +97,9 @@ export default function App() {
     if (!firebaseUser) return;
 
     const collRef = collection(
-      db,
-      'artifacts',
-      appId,
-      'public',
-      'data',
-      'inconsistencias'
-    );
+  db,
+  'inconsistencias'
+);
 
     const unsubscribe = onSnapshot(collRef, (snapshot) => {
 
@@ -508,21 +512,43 @@ export default function App() {
 
 <td>
 
-  <span
+  <select
+    value={reg.status}
+    onChange={async (e) => {
+
+      try {
+
+        const docRef = doc(
+  db,
+  'inconsistencias',
+  reg.id
+);
+
+        await updateDoc(docRef, {
+          status: e.target.value
+        });
+
+      } catch (error) {
+
+        console.error(error);
+        alert('Erro ao atualizar status');
+
+      }
+
+    }}
+    className="input-modern"
     style={{
-      padding: '6px 12px',
-      borderRadius: '999px',
-      fontSize: '12px',
-      fontWeight: 600,
+
+      minWidth: '160px',
 
       background:
         reg.status === 'Finalizado'
-          ? 'rgba(34,197,94,0.2)'
+          ? 'rgba(34,197,94,0.15)'
           : reg.status === 'Crítico'
-          ? 'rgba(239,68,68,0.2)'
+          ? 'rgba(239,68,68,0.15)'
           : reg.status === 'Pendente'
-          ? 'rgba(234,179,8,0.2)'
-          : 'rgba(59,130,246,0.2)',
+          ? 'rgba(234,179,8,0.15)'
+          : 'rgba(59,130,246,0.15)',
 
       color:
         reg.status === 'Finalizado'
@@ -534,8 +560,13 @@ export default function App() {
           : '#3b82f6'
     }}
   >
-    {reg.status}
-  </span>
+
+    <option>Em andamento</option>
+    <option>Finalizado</option>
+    <option>Pendente</option>
+    <option>Crítico</option>
+
+  </select>
 
 </td>
                 </tr>
