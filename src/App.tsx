@@ -13,6 +13,8 @@ import {
   updateDoc
 } from 'firebase/firestore';
 
+
+
 // FIREBASE
 const firebaseConfig = {
   apiKey: "AIzaSyA7T9mLGGXQT_0iZcUB4nmn_dcslAZ4mjw",
@@ -27,7 +29,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-
 const appId = "portaldaarmazenagem";
 
 // SENHAS
@@ -59,8 +60,9 @@ export default function App() {
   fim: '',
   descricao: '',
   status: 'Em andamento'
+  
 });
-
+const [imagem, setImagem] = useState<any>(null);
   // AUTH
   useEffect(() => {
 
@@ -166,7 +168,23 @@ export default function App() {
   db,
   'inconsistencias'
 );
+let imageUrl = '';
 
+if (imagem) {
+
+  imageUrl = await new Promise((resolve) => {
+
+    const reader = new FileReader();
+
+    reader.onloadend = () => {
+     resolve(reader.result as string);
+    };
+
+    reader.readAsDataURL(imagem);
+
+  });
+
+}
       await addDoc(collRef, {
   turno: turnoLogado,
   data: form.data,
@@ -174,6 +192,7 @@ export default function App() {
   fim: form.fim,
   descricao: form.descricao,
   status: form.status,
+  imagem: imageUrl,
   userId: firebaseUser.uid,
   createdAt: serverTimestamp()
 });
@@ -459,7 +478,20 @@ const exportarCSV = () => {
   </select>
 
 </div>
+<input
+  type="file"
+  accept="image/*"
+  capture="environment"
+  className="input-modern"
+  style={{ marginTop: '20px' }}
+  onChange={(e: any) => {
 
+    if (e.target.files[0]) {
+      setImagem(e.target.files[0]);
+    }
+
+  }}
+/>
           <textarea
             rows={4}
             value={form.descricao}
@@ -553,7 +585,37 @@ const exportarCSV = () => {
                     {reg.inicio} até {reg.fim}
                   </td>
 
-                 <td>{reg.descricao}</td>
+                 <td>
+
+  <div
+    style={{
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '10px'
+    }}
+  >
+
+    <span>
+      {reg.descricao}
+    </span>
+
+    {reg.imagem && (
+
+      <img
+        src={reg.imagem}
+        alt="Imagem"
+        style={{
+          width: '120px',
+          borderRadius: '12px',
+          border: '1px solid rgba(255,255,255,0.1)'
+        }}
+      />
+
+    )}
+
+  </div>
+
+</td>
 
 <td>
 
