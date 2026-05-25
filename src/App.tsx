@@ -162,13 +162,9 @@ export default function App() {
     try {
 
       const collRef = collection(
-        db,
-        'artifacts',
-        appId,
-        'public',
-        'data',
-        'inconsistencias'
-      );
+  db,
+  'inconsistencias'
+);
 
       await addDoc(collRef, {
   turno: turnoLogado,
@@ -535,26 +531,26 @@ export default function App() {
     className="input-modern"
     style={{
 
-      minWidth: '160px',
+  minWidth: '160px',
 
-      background:
-        (reg.status || 'Em andamento')
-          ? 'rgba(34,197,94,0.15)'
-          : reg.status === 'Crítico'
-          ? 'rgba(239,68,68,0.15)'
-          : reg.status === 'Pendente'
-          ? 'rgba(234,179,8,0.15)'
-          : 'rgba(59,130,246,0.15)',
+  background:
+    (reg.status || 'Em andamento') === 'Finalizado'
+      ? 'rgba(34,197,94,0.15)'
+      : (reg.status || 'Em andamento') === 'Crítico'
+      ? 'rgba(239,68,68,0.15)'
+      : (reg.status || 'Em andamento') === 'Pendente'
+      ? 'rgba(234,179,8,0.15)'
+      : 'rgba(59,130,246,0.15)',
 
-      color:
-        (reg.status || 'Em andamento')
-          ? '#22c55e'
-          : reg.status === 'Crítico'
-          ? '#ef4444'
-          : reg.status === 'Pendente'
-          ? '#eab308'
-          : '#3b82f6'
-    }}
+  color:
+    (reg.status || 'Em andamento') === 'Finalizado'
+      ? '#22c55e'
+      : (reg.status || 'Em andamento') === 'Crítico'
+      ? '#ef4444'
+      : (reg.status || 'Em andamento') === 'Pendente'
+      ? '#eab308'
+      : '#3b82f6'
+}}
   >
 
     <option>Em andamento</option>
