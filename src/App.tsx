@@ -1,3 +1,4 @@
+import { saveAs } from 'file-saver';
 import './index.css';
 import React, { useState, useEffect, useMemo } from 'react';
 import { initializeApp } from 'firebase/app';
@@ -344,7 +345,47 @@ export default function App() {
       </div>
     );
   }
+const exportarCSV = () => {
 
+  const headers = [
+    'Turno',
+    'Data',
+    'Inicio',
+    'Fim',
+    'Status',
+    'Descricao'
+  ];
+
+  const rows = registros.map((r: any) => [
+
+    r.turno || '',
+    r.data || '',
+    r.inicio || '',
+    r.fim || '',
+    r.status || 'Em andamento',
+    r.descricao || ''
+
+  ]);
+
+  const csvContent =
+
+    [headers, ...rows]
+      .map(e => e.join(';'))
+      .join('\n');
+
+  const blob = new Blob(
+
+    [csvContent],
+
+    {
+      type: 'text/csv;charset=utf-8;'
+    }
+
+  );
+
+  saveAs(blob, 'inconsistencias.csv');
+
+};
   // DASHBOARD
   return (
 
@@ -469,7 +510,15 @@ export default function App() {
             onChange={(e) => setBusca(e.target.value)}
             className="search-box"
           />
-
+  <button
+  onClick={exportarCSV}
+  className="btn-modern"
+  style={{
+    width: '220px'
+  }}
+>
+  Exportar CSV
+</button>
         </div>
 
         <div className="table-wrapper">
