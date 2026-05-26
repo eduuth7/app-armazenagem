@@ -194,6 +194,16 @@ button {
   margin-top: 20px;
 }
 
+@media (max-width: 768px) {
+
+  .textarea-modern {
+
+    font-size: 16px !important;
+
+  }
+
+}
+
 .textarea-modern:focus {
   outline: none;
   border-color: #3b82f6;

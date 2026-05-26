@@ -60,10 +60,12 @@ export default function App() {
   inicio: '',
   fim: '',
   descricao: '',
+  correcao: '',
   status: 'Em andamento'
   
 });
 const [imagem, setImagem] = useState<any>(null);
+const [imagemModal, setImagemModal] = useState('');
   // AUTH
   useEffect(() => {
 
@@ -156,7 +158,7 @@ const [imagem, setImagem] = useState<any>(null);
 
     if (!firebaseUser) return;
 
-    if (!form.data || !form.inicio || !form.fim || !form.descricao) {
+    if (!form.data || !form.inicio || !form.descricao) {
       alert('Preencha todos os campos.');
       return;
     }
@@ -228,6 +230,7 @@ if (imagem) {
   inicio: form.inicio,
   fim: form.fim,
   descricao: form.descricao,
+  correcao: form.correcao,
   status: form.status,
   imagem: imageUrl,
   userId: firebaseUser.uid,
@@ -239,6 +242,7 @@ if (imagem) {
   inicio: '',
   fim: '',
   descricao: '',
+  correcao: '',
   status: 'Em andamento'
 });
 
@@ -494,12 +498,7 @@ const exportarCSV = () => {
     className="input-modern"
   />
 
-  <input
-    type="time"
-    value={form.fim}
-    onChange={(e) => setForm({ ...form, fim: e.target.value })}
-    className="input-modern"
-  />
+ 
 
   <select
     value={form.status}
@@ -528,13 +527,17 @@ const exportarCSV = () => {
 
   }}
 />
-          <textarea
-            rows={4}
-            value={form.descricao}
-            onChange={(e) => setForm({ ...form, descricao: e.target.value })}
-            placeholder="Descreva detalhadamente o problema..."
-            className="textarea-modern"
-          />
+
+
+  <textarea
+  rows={4}
+  value={form.descricao}
+  onChange={(e) => setForm({ ...form, descricao: e.target.value })}
+  placeholder="Descreva detalhadamente o problema..."
+  className="textarea-modern"
+  style={{ marginTop: '20px' }}
+  
+/>
 
           <div style={{ marginTop: '20px' }}>
 
@@ -599,8 +602,15 @@ const exportarCSV = () => {
 
                 <th>Turno</th>
                 <th>Data</th>
-                <th>Horário</th>
+                <th>Início</th>
+                <th>Finalização</th>
                 <th>Descrição</th>
+                <th>Imagem</th>
+                <th style={{ minWidth: '220px' }}>
+
+  Correção
+
+</th>
                 <th>Status</th>
                 <th>Ações</th>
 
@@ -616,39 +626,80 @@ const exportarCSV = () => {
 
                   <td>{reg.turno}</td>
 
-                  <td>{reg.data}</td>
+                  <td>
+
+  {reg.data
+    ?.split('-')
+    .reverse()
+    .join('/')}
+
+</td>
 
                   <td>
-                    {reg.inicio} até {reg.fim}
-                  </td>
+
+  {reg.inicio}
+
+</td>
+
+<td>
+
+  <input
+    type="time"
+    value={reg.fim || ''}
+    onChange={async (e) => {
+
+      try {
+
+        const docRef = doc(
+          db,
+          'inconsistencias',
+          reg.id
+        );
+
+        await updateDoc(docRef, {
+          fim: e.target.value
+        });
+
+      } catch (error) {
+
+        console.error(error);
+        alert('Erro ao atualizar finalização');
+
+      }
+
+    }}
+    className="input-modern"
+    style={{
+      minWidth: '120px'
+    }}
+  />
+
+</td>
 
                  <td>
 
-  <div
-    style={{
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '10px'
-    }}
-  >
+ <div
+  style={{
+    display: 'flex',
+    alignItems: 'flex-start',
+    gap: '14px'
+  }}
+>
 
-    <span>
-      {reg.descricao}
-    </span>
+   <div
+  style={{
+    flex: 1,
+    minWidth: '180px'
+  }}
+>
 
-    {reg.imagem && (
+  <span>
 
-      <img
-        src={reg.imagem}
-        alt="Imagem"
-        style={{
-          width: '120px',
-          borderRadius: '12px',
-          border: '1px solid rgba(255,255,255,0.1)'
-        }}
-      />
+  {reg.descricao}
 
-    )}
+</span>
+
+    </div>
 
   </div>
 
@@ -656,7 +707,68 @@ const exportarCSV = () => {
 
 <td>
 
+  {reg.imagem && (
+
+      <img
+  src={reg.imagem}
+  alt="Imagem"
+  onClick={() => setImagemModal(reg.imagem)}
+  style={{
+    width: window.innerWidth < 768 ? '50px' : '120px',
+    borderRadius: '12px',
+    border: '1px solid rgba(255,255,255,0.1)',
+    cursor: 'pointer'
+  }}
+/>
+
+ )}
+
+</td>
+
+<td>
+
+  <textarea
+    value={reg.correcao || ''}
+    onChange={async (e) => {
+
+      try {
+
+        const docRef = doc(
+          db,
+          'inconsistencias',
+          reg.id
+        );
+
+        await updateDoc(docRef, {
+          correcao: e.target.value
+        });
+
+      } catch (error) {
+
+        console.error(error);
+        alert('Erro ao atualizar correção');
+
+      }
+
+    }}
+    className="textarea-modern"
+ style={{
+  width: window.innerWidth < 768 ? '140px' : '180px',
+  minHeight: window.innerWidth < 768 ? '55px' : '70px',
+  fontSize: '14px',
+  padding: window.innerWidth < 768 ? '6px' : '12px',
+  WebkitTextSizeAdjust: '100%',
+  lineHeight: '1.4',
+  resize: 'vertical'
+}}
+  />
+
+</td>
+
+<td>
+
   <select
+  
    value={reg.status || 'Em andamento'}
     onChange={async (e) => {
 
@@ -679,7 +791,9 @@ const exportarCSV = () => {
     className="input-modern"
     style={{
 
-  minWidth: '160px',
+  minWidth: window.innerWidth < 768 ? '95px' : '160px',
+fontSize: '14px',
+padding: window.innerWidth < 768 ? '4px' : undefined,
 
   background:
     (reg.status || 'Em andamento') === 'Finalizado'
@@ -769,7 +883,37 @@ const exportarCSV = () => {
         </div>
 
       </div>
+{imagemModal && (
 
+  <div
+    onClick={() => setImagemModal('')}
+    style={{
+      position: 'fixed',
+      inset: 0,
+      background: 'rgba(0,0,0,0.85)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      zIndex: 9999,
+      padding: '20px',
+      cursor: 'pointer'
+    }}
+  >
+
+    <img
+      src={imagemModal}
+      alt="Imagem ampliada"
+      style={{
+        maxWidth: '95%',
+        maxHeight: '90vh',
+        borderRadius: '20px',
+        boxShadow: '0 20px 60px rgba(0,0,0,0.5)'
+      }}
+    />
+
+  </div>
+
+)}
     </div>
   );
 }
