@@ -10,7 +10,8 @@ import {
   onSnapshot,
   serverTimestamp,
   doc,
-  updateDoc
+  updateDoc,
+  deleteDoc
 } from 'firebase/firestore';
 
 
@@ -601,6 +602,7 @@ const exportarCSV = () => {
                 <th>Horário</th>
                 <th>Descrição</th>
                 <th>Status</th>
+                <th>Ações</th>
 
               </tr>
 
@@ -707,6 +709,55 @@ const exportarCSV = () => {
   </select>
 
 </td>
+<td>
+
+  <button
+
+    onClick={async () => {
+
+      const confirmar = confirm(
+        'Deseja excluir este registro?'
+      );
+
+      if (!confirmar) return;
+
+      try {
+
+        const docRef = doc(
+          db,
+          'inconsistencias',
+          reg.id
+        );
+
+        await deleteDoc(docRef);
+
+      } catch (error) {
+
+        console.error(error);
+        alert('Erro ao excluir');
+
+      }
+
+    }}
+
+    style={{
+
+      background: 'rgba(239,68,68,0.15)',
+      border: '1px solid rgba(239,68,68,0.25)',
+      color: '#ef4444',
+      borderRadius: '10px',
+      padding: '8px 12px',
+      cursor: 'pointer',
+      fontWeight: 700
+
+    }}
+
+  >
+    X
+  </button>
+
+</td>
+
                 </tr>
 
               ))}
